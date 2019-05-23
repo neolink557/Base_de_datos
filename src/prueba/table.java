@@ -10,20 +10,27 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 /**
  *
  * @author Braya
  */
 public class table extends javax.swing.JFrame {
+
     public static final String URL = "jdbc:mysql://localhost:3306/university_for_u";
     public static final String USERNAME = "root";
     public static final String PASSWORD = "";
+    public int rows=0;
     public table() {
         initComponents();
+        Iniciar();
+
     }
 
     /**
@@ -36,27 +43,26 @@ public class table extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jtstudentes = new javax.swing.JTable();
+        jtstudiantes = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
+        Addbutton = new javax.swing.JButton();
+        Alv = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jtstudentes.setModel(new javax.swing.table.DefaultTableModel(
+        jtstudiantes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
-                "Code", "name", "note1", "note3", "note 2"
+                "name", "email", "pass", "genre", "0"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                true, true, true, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -67,12 +73,26 @@ public class table extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jtstudentes);
+        jScrollPane1.setViewportView(jtstudiantes);
 
-        jButton1.setText("Connect");
+        jButton1.setText("Save");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+
+        Addbutton.setText("New");
+        Addbutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddbuttonActionPerformed(evt);
+            }
+        });
+
+        Alv.setText("ALv");
+        Alv.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AlvActionPerformed(evt);
             }
         });
 
@@ -81,10 +101,17 @@ public class table extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton1)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(62, 62, 62)
+                        .addComponent(Addbutton)
+                        .addGap(90, 90, 90)
+                        .addComponent(Alv)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)))
                 .addContainerGap(71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -92,8 +119,11 @@ public class table extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addGap(72, 72, 72)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(Addbutton)
+                    .addComponent(Alv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -101,38 +131,113 @@ public class table extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Connection con =null;
-        con=getConnection();
-        PreparedStatement ps;
-        ResultSet res;
+        int ras=0;
+
+        //conexion
         try {
-            ps=con.prepareCall("SELECT * FROM usuarios");
-            res=ps.executeQuery();
+            for (int i = rows; i < jtstudiantes.getRowCount(); i++) {
+                
+                Connection con = null;
+                con = getConnection();
+                PreparedStatement ps;
+                ps = con.prepareStatement("INSERT INTO usuarios (name,email,pass,genre) Values (?,?,?,?)");
+                System.out.println(jtstudiantes.getRowCount()+"sdads");
+            System.out.println((String) jtstudiantes.getValueAt(i, 0));
+            System.out.println((String) jtstudiantes.getValueAt(i, 1));
+            System.out.println((String) jtstudiantes.getValueAt(i, 2));
+            System.out.println((String) jtstudiantes.getValueAt(i, 3));
+            ps.setString(1, (String) jtstudiantes.getValueAt(i, 0));
+            ps.setString(2, (String) jtstudiantes.getValueAt(i, 1));
+            ps.setString(3, (String) jtstudiantes.getValueAt(i, 2));
+            ps.setString(4, (String) jtstudiantes.getValueAt(i, 3));
+
             
-            if (res.next()) {
-                JOptionPane.showMessageDialog(null, res.getString("name")+ "-" + res.getString("email"));          
-            }else
-            {
-                JOptionPane.showMessageDialog(null, "matenme y quemen mis crias");
-            }
+            
+            
+
+            ras = ps.executeUpdate();
             con.close();
+            }
             
+            if (ras > 0) {
+                JOptionPane.showMessageDialog(null, "wardado");
+            } else {
+                JOptionPane.showMessageDialog(null, "no wrdado");
+            }
+            
+
         } catch (Exception ex) {
             Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    public static Connection getConnection(){
-        Connection con =null;
+    private void AddbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddbuttonActionPerformed
+        
+        DefaultTableModel model = (DefaultTableModel) jtstudiantes.getModel();
+        model.addRow(new Object[jtstudiantes.getRowCount()]);
+    }//GEN-LAST:event_AddbuttonActionPerformed
+
+    private void AlvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AlvActionPerformed
+         Connection con = null;
+        con = getConnection();
+        PreparedStatement ps;
+       
+        
+        //conexion
+        try {
+            ps = con.prepareStatement("DELETE FROM usuarios");
+            int ras = ps.executeUpdate("DELETE FROM usuarios");
+            con.close();
+
+        } catch (Exception ex) {
+            Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_AlvActionPerformed
+
+    public void Iniciar()
+    {
+        Connection con = null;
+        con = getConnection();
+        PreparedStatement ps;
+        ResultSet res;
+        
+        //conexion
+        try {
+            ps = con.prepareCall("SELECT * FROM usuarios");
+            res = ps.executeQuery();
+            int i=0;
+                while (res.next()) {
+                DefaultTableModel model = (DefaultTableModel) jtstudiantes.getModel();
+                model.addRow(new Object[jtstudiantes.getRowCount()]);
+                model.setValueAt(res.getString("name"), i, 0);
+                model.setValueAt(res.getString("email"), i, 1);
+                model.setValueAt(res.getString("pass"), i, 2);
+                model.setValueAt(res.getString("genre"), i, 3);
+                rows++;
+                i++;
+                }
+              
+            
+
+            con.close();
+
+        } catch (Exception ex) {
+            Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public static Connection getConnection() {
+        Connection con = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            con=(Connection) DriverManager.getConnection(URL,USERNAME,PASSWORD);
-            JOptionPane.showMessageDialog(null, "laverga");
+            con = (Connection) DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            
         } catch (Exception ex) {
             Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return con;
     }
+
     /**
      * @param args the command line arguments
      */
@@ -169,8 +274,10 @@ public class table extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Addbutton;
+    private javax.swing.JButton Alv;
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jtstudentes;
+    private javax.swing.JTable jtstudiantes;
     // End of variables declaration//GEN-END:variables
 }
