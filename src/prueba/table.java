@@ -6,6 +6,9 @@
 package prueba;
 
 import com.mysql.jdbc.Connection;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,11 +29,17 @@ public class table extends javax.swing.JFrame {
     public static final String URL = "jdbc:mysql://localhost:3306/university_for_u";
     public static final String USERNAME = "root";
     public static final String PASSWORD = "";
-    public int rows=0;
+    public int rows = 0;
+
     public table() {
         initComponents();
         Iniciar();
-
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                Save();
+                System.exit(0);
+            }
+        });
     }
 
     /**
@@ -44,7 +53,6 @@ public class table extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jtstudiantes = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
         Addbutton = new javax.swing.JButton();
         Alv = new javax.swing.JButton();
 
@@ -75,13 +83,6 @@ public class table extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jtstudiantes);
 
-        jButton1.setText("Save");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
         Addbutton.setText("New");
         Addbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -108,10 +109,8 @@ public class table extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(62, 62, 62)
                         .addComponent(Addbutton)
-                        .addGap(90, 90, 90)
-                        .addComponent(Alv)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addComponent(Alv)))
                 .addContainerGap(71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -121,7 +120,6 @@ public class table extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(72, 72, 72)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
                     .addComponent(Addbutton)
                     .addComponent(Alv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -129,85 +127,86 @@ public class table extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        int ras=0;
+    public void Save()
+    {
+        int ras = 0;
 
         //conexion
         try {
             for (int i = rows; i < jtstudiantes.getRowCount(); i++) {
-                
+
                 Connection con = null;
                 con = getConnection();
                 PreparedStatement ps;
                 ps = con.prepareStatement("INSERT INTO usuarios (name,email,pass,genre) Values (?,?,?,?)");
-                System.out.println(jtstudiantes.getRowCount()+"sdads");
-            System.out.println((String) jtstudiantes.getValueAt(i, 0));
-            System.out.println((String) jtstudiantes.getValueAt(i, 1));
-            System.out.println((String) jtstudiantes.getValueAt(i, 2));
-            System.out.println((String) jtstudiantes.getValueAt(i, 3));
-            ps.setString(1, (String) jtstudiantes.getValueAt(i, 0));
-            ps.setString(2, (String) jtstudiantes.getValueAt(i, 1));
-            ps.setString(3, (String) jtstudiantes.getValueAt(i, 2));
-            ps.setString(4, (String) jtstudiantes.getValueAt(i, 3));
+                System.out.println(jtstudiantes.getRowCount() + "sdads");
+                System.out.println((String) jtstudiantes.getValueAt(i, 0));
+                System.out.println((String) jtstudiantes.getValueAt(i, 1));
+                System.out.println((String) jtstudiantes.getValueAt(i, 2));
+                System.out.println((String) jtstudiantes.getValueAt(i, 3));
+                ps.setString(1, (String) jtstudiantes.getValueAt(i, 0));
+                ps.setString(2, (String) jtstudiantes.getValueAt(i, 1));
+                ps.setString(3, (String) jtstudiantes.getValueAt(i, 2));
+                ps.setString(4, (String) jtstudiantes.getValueAt(i, 3));
 
-            
-            
-            
-
-            ras = ps.executeUpdate();
-            con.close();
+                ras = ps.executeUpdate();
+                con.close();
             }
-            
+
             if (ras > 0) {
                 JOptionPane.showMessageDialog(null, "wardado");
             } else {
                 JOptionPane.showMessageDialog(null, "no wrdado");
             }
-            
 
         } catch (Exception ex) {
             Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
-
+    }
     private void AddbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddbuttonActionPerformed
-        
+
         DefaultTableModel model = (DefaultTableModel) jtstudiantes.getModel();
         model.addRow(new Object[jtstudiantes.getRowCount()]);
+        System.out.println(jtstudiantes.getRowCount());
     }//GEN-LAST:event_AddbuttonActionPerformed
 
     private void AlvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AlvActionPerformed
-         Connection con = null;
+
+        Connection con = null;
         con = getConnection();
         PreparedStatement ps;
-       
-        
+
         //conexion
         try {
             ps = con.prepareStatement("DELETE FROM usuarios");
             int ras = ps.executeUpdate("DELETE FROM usuarios");
             con.close();
-
+            JOptionPane.showMessageDialog(null, "borrado");
         } catch (Exception ex) {
             Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        System.out.println("prueba.table.AlvActionPerformed()" + jtstudiantes.getRowCount());
+        DefaultTableModel model = (DefaultTableModel) jtstudiantes.getModel();
+        for (int i = model.getRowCount() - 1; i >= 0; i--) {
+            model.removeRow(i);
+        }
+
+
     }//GEN-LAST:event_AlvActionPerformed
 
-    public void Iniciar()
-    {
+    public void Iniciar() {
         Connection con = null;
         con = getConnection();
         PreparedStatement ps;
         ResultSet res;
-        
+
         //conexion
         try {
             ps = con.prepareCall("SELECT * FROM usuarios");
             res = ps.executeQuery();
-            int i=0;
-                while (res.next()) {
+            int i = 0;
+            while (res.next()) {
                 DefaultTableModel model = (DefaultTableModel) jtstudiantes.getModel();
                 model.addRow(new Object[jtstudiantes.getRowCount()]);
                 model.setValueAt(res.getString("name"), i, 0);
@@ -216,9 +215,7 @@ public class table extends javax.swing.JFrame {
                 model.setValueAt(res.getString("genre"), i, 3);
                 rows++;
                 i++;
-                }
-              
-            
+            }
 
             con.close();
 
@@ -226,12 +223,13 @@ public class table extends javax.swing.JFrame {
             Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     public static Connection getConnection() {
         Connection con = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = (Connection) DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            
+
         } catch (Exception ex) {
             Logger.getLogger(table.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -276,7 +274,6 @@ public class table extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Addbutton;
     private javax.swing.JButton Alv;
-    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jtstudiantes;
     // End of variables declaration//GEN-END:variables
